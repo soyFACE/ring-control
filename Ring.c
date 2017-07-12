@@ -214,7 +214,7 @@ static unsigned long store;				// physical memory address to write to  // JAM 20
 
 
 //---------------------------------------------------------------------------
-// DEFINIZIONE DELLE VARIABILI
+// Definitions of variables
 //---------------------------------------------------------------------------
 uchar wI; // JAM 20170708 Iterator
 uchar byIChA[N_CHANNELS+1]; // JAM 20170708 Iterator for cycling through sectors at low wind speed
@@ -292,6 +292,10 @@ uint giorno; // JAM 20170708 "Day" I only see this in comments.
 uint mese; // JAM 20170708 "Month" This is not used at all.
 uint ggiul; // JAM 20170708 This is not used at all.
 float dayl; // JAM 20170708 This is not used at all.
+float starttime_ozone = 9
+float endtime_ozone = 17
+float starttime_co2 = 8
+float endtime_co2 = 17
 float sunr;
 float suns;
 float ora;  //Current Decimal Time  // JAM 20170708 "Hour"
@@ -879,7 +883,7 @@ void cont_loop()
     float sba1;
     float sba2;
 
-#ifdef NETWORK
+#ifdef NETWORK // 20170712 JAM Do these need to be set at every iteration of the continuous loop?
     my_port_A = 888;
     my_port_B = 999;
     my_port_C = 777;
@@ -942,15 +946,14 @@ void cont_loop()
             {
                 anaOutVolts(ChanAddr(DABRD, 7), 3);
 
-                if(ozonator_loc || (ozonator_loc && ozonator_rem)) { // JAM 20170709 The status of ozonator_rem doesn't matter in this if
+                if(ozonator_loc || (ozonator_loc && ozonator_rem)) // JAM 20170709 The status of ozonator_rem doesn't matter in this if
+                { 
                     ledOut(0,1);
                 }
                 else {
                     ledOut(0,0);
                 }
-                //tam0509  if ((ora>sunr && ora<suns)  && ozonator_rem ) {ledOut(1,1);} else {ledOut(1,0);}
-
-                if ((ora>9 && ora<18)  && ozonator_rem ) {
+                if ((ora> starttime_ozone && ora< endtime_ozone)  && ozonator_rem ) {
                     ledOut(1,1);
                 }
                 else {
@@ -1004,7 +1007,7 @@ void sector_select(void)
     {
         if(LAYER[chn]==0)  // CO2 CONTROL LAYER
         {
-            if (((ora>sunr && ora<suns) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000 // JAM 20170708 "Performs operations only the day of 2000-08-18". The comment seems unrelated. nighttime_local is never assigned so I assume everything after the || is irrelevant. nighttime_remote, CO2_loc, and CO2_rem are assigned values of 1.
+            if (((ora>starttime_co2 && ora<endtime_co2) || (nighttime_remote && nighttime_local)) && CO2_loc && CO2_rem)   // Esegue le operazioni solo di giorno 18.08.2000 // JAM 20170708 "Performs operations only the day of 2000-08-18". The comment seems unrelated. nighttime_local is never assigned so I assume everything after the || is irrelevant. nighttime_remote, CO2_loc, and CO2_rem are assigned values of 1.
             {
                 if (nSel>=MOBILE && s45>0.5) // JAM 20170709 In the first iteration nSel should be 1 and MOBILE should be 60. It looks like sector_select() is repeatedly called in the main loop, when nSel = 60 this part is activated and assigns the sector.
                 {
@@ -1064,8 +1067,8 @@ void sector_select(void)
         if(LAYER[chn]==1)  // OZONE CONTROL LAYER
         {
 
-//tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem )   // Esegue le operazioni solo di giorno 18.08.2000
-            if ((ora>9 && ora<18)  && ozonator_rem )   // Esegue le operazioni solo di giorno 18.08.2000
+
+            if ((ora>starttime_ozone && ora<endtime_ozone)  && ozonator_rem )
             // JAM 20170709 This looks like it turns on the relay in the control box which allows the relay in the shed box to turn on.
             {
                 digOut(ChanAddr(RELAY, 0),TURNON);  //CHANGE2003
@@ -1079,12 +1082,8 @@ void sector_select(void)
             {
                 if (SEC_TIMER > delay_restart_time) delay_restart = FALSE;
                 //printf("%ld %ld \n" ,delay_restart_time, SEC_TIMER);
-
             }
-
-
-//tam0509 if ((ora>sunr && ora<suns) && ozonator_loc && ozonator_rem && !purge && !delay_restart)   // Esegue le operazioni solo di giorno 18.08.2000
-            if ((ora>9 && ora<18) && ozonator_loc && ozonator_rem && !purge && !delay_restart)   // Esegue le operazioni solo di giorno 18.08.2000
+            if ((ora>starttime_ozone && ora<endtime_ozone) && ozonator_loc && ozonator_rem && !purge && !delay_restart)
             {
                 if (nSel>=MOBILE && s45>0.5)
                 {
@@ -1239,7 +1238,7 @@ void fControl(void)
         nContao[chn]++;
         if(LAYER[chn]==0)
         {
-            if ((ora<sunr || ora>suns) && (nighttime_remote && nighttime_local))
+            if ((ora<starttime_co2 || ora>endtime_co2) && (nighttime_remote && nighttime_local))
             {
                 TARG[chn]=  nighttimeCO2;
             }
@@ -1261,7 +1260,7 @@ void fControl(void)
         if(LAYER[chn]==0)  // CO2 CONTROL LAYER
         {
             //if (ora<sunr | ora>suns | !nighttime_remote | !nighttime_local | !CO2_rem | !CO2_loc)   // If nighttime_remote
-            if(((ora<sunr || ora>suns) && !(nighttime_remote && nighttime_local))|| !CO2_rem || !CO2_loc )
+            if(((ora<starttime_co2 || ora>endtime_co2) && !(nighttime_remote && nighttime_local)) || !CO2_rem || !CO2_loc )
             {
                 fVs[chn]=0;
             }
@@ -1384,8 +1383,7 @@ void fControl(void)
 
         if(LAYER[chn]==1)  // O3 CONTROL LAYER
         {
-            //tam0509 if (ora<sunr || ora>suns || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
-            if (ora<9 || ora>18 || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
+            if (ora<starttime_ozone || ora>endtime_ozone || !ozonator_loc || !ozonator_rem || !flow  )   // If nighttime or ozone off
             {
                 fVs[chn]=0;
             }
@@ -1523,7 +1521,7 @@ void set_output(void)
     {
         if(LAYER[chn]==0)  // CO2 CONTROL LAYER
         {
-            if ((ora<sunr || ora>suns) && !(nighttime_remote && nighttime_local))   // Esegue le operazioni solo di giorno 18.08.2000
+            if ((ora<starttime_co2 || ora>endtime_co2) && !(nighttime_remote && nighttime_local))
             {
                 anaOutVolts(ChanAddr(DABRD, chn), 0);
                 digOut(ChanAddr(RELAY, 2),TURNOFF);  //CO2 shutoff valve
@@ -1536,8 +1534,7 @@ void set_output(void)
         }
         if(LAYER[chn]==1)  // O3 CONTROL LAYER
         {
-            //tam0509 if (ora<sunr || ora>suns)   // Esegue le operazioni solo di giorno 18.08.2000
-            if (ora<9 || ora>18)   // Esegue le operazioni solo di giorno 18.08.2000
+            if (ora<starttime_ozone || ora>endtime_ozone)
             {
                 anaOutVolts(ChanAddr(DABRD, DA_Channel[chn]), 0);
             }
@@ -1698,13 +1695,13 @@ void minute_average(void)
 
 void calc_day(void)
 {
-    double d, m, y;
+    double d, m, y; // These are not used in this function. I don't think they do anything in CalcSun either.
     tm_rd(&rtc);
     y = 2005;
 
     CalcSun(rtc.tm_year, rtc.tm_mon, rtc.tm_mday, 40.04,-88.13,-6);
 //printf("%d,%d,%d,%d \n",d,m,riset,settm);
-    sunr = (float)riset; // JAM 20170708 I suspect riset and settm are set by CalcSun.
+    sunr = (float)riset; // JAM 20170708 I suspect riset and settm are changed in the body of CalcSun, rather than returned from any function.
     suns = (float)settm;
     ora=rtc.tm_hour+(float)(rtc.tm_min/60.);
 //printf("%f %f %f \n",sunr, suns, ora);
@@ -1714,7 +1711,7 @@ void calc_day(void)
 void Reset_Ozone_Vars(void)
 {
 
-    for(nI=0; nI<N_CHANNELS+1; nI++)   // Inizializza  contatori
+    for(nI=0; nI<N_CHANNELS+1; nI++)
     {
         if(LAYER[nI] == 1)
         {
@@ -2036,8 +2033,7 @@ void readString_C(void)
     case 79: //Set Ozone
         token = strtok(NULL,delim);
         ozonator_rem = atoi(token);	//set ozone
-        //tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
-        if ((ora>9 && ora<18)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
+        if ((ora>starttime_ozone && ora<endtime_ozone)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
         else digOut(ChanAddr(RELAY, 0),TURNOFF);
 
         token = strtok(NULL,delim);
@@ -3125,8 +3121,7 @@ void readString_IP(void)
     case 79: //Set Ozone
         token = strtok(NULL,delim);
         ozonator_rem = atoi(token);	//set ozone
-        //tam0509 if ((ora>sunr && ora<suns)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
-        if ((ora>9 && ora<18)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
+        if ((ora>starttime_ozone && ora<endtime_ozone)  && ozonator_rem ) digOut(ChanAddr(RELAY, 0),TURNON);
         else digOut(ChanAddr(RELAY, 0),TURNOFF);
 
         token = strtok(NULL,delim);
