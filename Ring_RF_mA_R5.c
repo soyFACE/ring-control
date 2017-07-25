@@ -9,7 +9,7 @@
 // cmm0517 annotated define parameters for easy user inputs. Go to line 722 to change
 
 #use SUNRISE.lib
-#define NETWORK  				// Comment Out to not load Network Drivers
+//#define NETWORK  				// Comment Out to not load Network Drivers
 #define INITIALIZE_PARAMS  //  ****MUST HAVE THIS enabled otherwise will use defaults**** if screen avail then == Run the first time to config settings - Comment out after that
 #ifdef NETWORK
 //	#define IPDOWNLOAD 			// Comment out to remove Network Firmware Upgrade
