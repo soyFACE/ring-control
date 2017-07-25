@@ -1408,7 +1408,7 @@ void fControl(void)
         }  //Chiude il loop della notte 18.08.2000
         if(LAYER[chn]==2) { // LAYER OFF
             fVp[chn] = 0;
-            fVs[chn]=fVp[chn];
+            fVs[chn]=fVp[chn]*5/8-(5/2); // JAM 20170725 Scale mA output to 0-10 volts.
         }
 
 
@@ -1428,7 +1428,7 @@ void set_output(void)
     for(chn=0; chn < N_CHANNELS+1; chn++) {
         if(LAYER[chn]==0) { // CO2 CONTROL LAYER
             if ((ora<sunr || ora>suns) && !(nighttime_remote && nighttime_local)) { // Esegue le operazioni solo di giorno 18.08.2000
-                anaOutmAmps(ChanAddr(DABRD, chn), 4);
+                anaOutmAmps(ChanAddr(DABRD, chn), 0);
                 digOut(ChanAddr(RELAY, 2),TURNOFF);  //CO2 shutoff valve
             } else {
                 anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
@@ -1438,7 +1438,7 @@ void set_output(void)
         if(LAYER[chn]==1) { // O3 CONTROL LAYER
             //tam0509 if (ora<sunr || ora>suns)   // Esegue le operazioni solo di giorno 18.08.2000
             if (ora<9 || ora>18) { // Esegue le operazioni solo di giorno 18.08.2000
-                anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), 4);
+                anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), 0);
             } else {
                 anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
             }
