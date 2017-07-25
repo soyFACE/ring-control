@@ -8,7 +8,7 @@
 
 
 #use SUNRISE.lib
-#define NETWORK  				// Comment Out to not load Network Drivers
+//#define NETWORK  				// Comment Out to not load Network Drivers
 #define INITIALIZE_PARAMS  //  Run the first time to config settings - Comment out after that
 #ifdef NETWORK
 //	#define IPDOWNLOAD 			// Comment out to remove Network Firmware Upgrade
