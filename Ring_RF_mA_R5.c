@@ -1310,7 +1310,7 @@ void fControl(void)
                         //CO2_rem = 0;
 
                     }
-                    fVs[chn]=16*fVp[chn] + 4;
+                    fVs[chn]=fVp[chn]*5/8-(5/2); // JAM 20170726 Scale the mA to V.
                     printf("fVs is %f \n fVp is %f \n", fVs[chn], fVp[chn]);
                 }
             }
