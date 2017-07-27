@@ -1245,7 +1245,7 @@ void fControl(void)
                     }
 
                     nCont01[chn]++;
-                    fVs[chn]=fVp[chn];
+                    fVs[chn]=fVp[chn]*5/8-(5/2);
                 } else {
                     fFspro[chn] = fFspro[chn] - fFpro0[chn][ nCont02[chn]];
                     fFsdif[chn] = fFsdif[chn] - fFdif0[chn][ nCont02[chn]];
@@ -1412,7 +1412,7 @@ void fControl(void)
         }  //Chiude il loop della notte 18.08.2000
         if(LAYER[chn]==2) { // LAYER OFF
             fVp[chn] = 0;
-            fVs[chn]=fVp[chn]*5/8-(5/2); // JAM 20170725 Scale mA output to 0-10 volts.
+            fVs[chn]=fVp[chn];
         }
 
 
