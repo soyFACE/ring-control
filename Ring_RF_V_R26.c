@@ -293,10 +293,10 @@ uint giorno;
 uint mese;
 uint ggiul;
 float dayl;
-float starttime_ozone = 9
-float endtime_ozone = 17
-float starttime_co2 = 8
-float endtime_co2 = 17
+float starttime_ozone = 9;
+float endtime_ozone = 17;
+float starttime_co2 = 8;
+float endtime_co2 = 17;
 float sunr;
 float suns;
 float ora;  //Current Decimal Time
@@ -735,15 +735,15 @@ main()
     //Read UserBlock Variables 3/4/04
     readUserBlockArray(save_data, save_lens, 1, 0);
 
-    printf("settings.[0] = %ld\n", settings[0]);
-    printf("settings.[1] = %ld\n", settings[1]);
-    printf("settings.[2] = %ld\n", settings[2]);
-    printf("settings.[3] = %ld\n", settings[3]);
-    printf("settings.[4] = %ld\n", settings[4]);
-    printf("settings.[5] = %ld\n", settings[5]);
-    printf("settings.[6] = %ld\n", settings[6]);
-    printf("settings.[7] = %ld\n", settings[7]);
-    printf("settings.[8] = %ld\n", settings[8]);
+    printf("Unit ID	settings.[0] = %ld\n", settings[0]);
+    printf("Nighttime	settings.[1] = %ld\n", settings[1]);
+    printf("Layer1 type	settings.[2] = %ld\n", settings[2]);
+    printf("Set point 1	settings.[3] = %ld\n", settings[3]);
+    printf("DA Channel	settings.[4] = %ld\n", settings[4]);
+    printf("Layer2 type	settings.[5] = %ld\n", settings[5]);
+    printf("Set point 2	settings.[6] = %ld\n", settings[6]);
+    printf("Anemometer	settings.[7] = %ld\n", settings[7]);
+    printf("Display	settings.[8] = %ld\n", settings[8]);
 
     UNIT_ID = (int)settings[0];
     nighttime_local = (int)settings[1];
@@ -1310,7 +1310,7 @@ void fControl(void)
                         //CO2_rem = 0;
 
                     }
-                    fVs[chn]=16*fVp[chn] + 4;
+                    fVs[chn]=fVp[chn];
                     printf("fVs is %f \n fVp is %f \n", fVs[chn], fVp[chn]);
                 }
             }
@@ -1412,7 +1412,7 @@ void fControl(void)
         }  //Chiude il loop della notte 18.08.2000
         if(LAYER[chn]==2) { // LAYER OFF
             fVp[chn] = 0;
-            fVs[chn]=fVp[chn]*5/8-(5/2); // JAM 20170725 Scale mA output to 0-10 volts.
+            fVs[chn]=fVp[chn];
         }
 
 
