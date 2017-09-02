@@ -10,7 +10,7 @@
 
 #use SUNRISE.lib
 //#define NETWORK  				// Comment Out to not load Network Drivers
-#define INITIALIZE_PARAMS  //  ****MUST HAVE THIS enabled otherwise will use defaults**** if screen avail then == Run the first time to config settings - Comment out after that
+//#define INITIALIZE_PARAMS  //  ****MUST HAVE THIS enabled otherwise will use defaults**** if screen avail then == Run the first time to config settings - Comment out after that
 #ifdef NETWORK
 //	#define IPDOWNLOAD 			// Comment out to remove Network Firmware Upgrade
 #endif
@@ -717,7 +717,7 @@ main()
     delay_restart = FALSE;
 
 #ifdef INITIALIZE_PARAMS
-    settings[0] = 2;       //channel select or Unit ID
+    settings[0] = 12;       //channel select or Unit ID
     settings[1] = 1;        //Nighttime local? Assume 1=enable daylight calc
     settings[2] = 0;        //Layer1 type 0=CO2, 1=O3, 2=Off
     settings[3] = 600;      //Set point layer1
@@ -735,15 +735,15 @@ main()
     //Read UserBlock Variables 3/4/04
     readUserBlockArray(save_data, save_lens, 1, 0);
 
-    printf("settings.[0] = %ld\n", settings[0]);
-    printf("settings.[1] = %ld\n", settings[1]);
-    printf("settings.[2] = %ld\n", settings[2]);
-    printf("settings.[3] = %ld\n", settings[3]);
-    printf("settings.[4] = %ld\n", settings[4]);
-    printf("settings.[5] = %ld\n", settings[5]);
-    printf("settings.[6] = %ld\n", settings[6]);
-    printf("settings.[7] = %ld\n", settings[7]);
-    printf("settings.[8] = %ld\n", settings[8]);
+    printf("Unit ID		settings.[0] = %ld\n", settings[0]);
+    printf("Nighttime	settings.[1] = %ld\n", settings[1]);
+    printf("Layer1 type	settings.[2] = %ld\n", settings[2]);
+    printf("Set point 1	settings.[3] = %ld\n", settings[3]);
+    printf("DA Channel	settings.[4] = %ld\n", settings[4]);
+    printf("Layer2 type	settings.[5] = %ld\n", settings[5]);
+    printf("Set point 2	settings.[6] = %ld\n", settings[6]);
+    printf("Anemometer	settings.[7] = %ld\n", settings[7]);
+    printf("Display		settings.[8] = %ld\n", settings[8]);
 
     UNIT_ID = (int)settings[0];
     nighttime_local = (int)settings[1];
@@ -1310,7 +1310,7 @@ void fControl(void)
                         //CO2_rem = 0;
 
                     }
-                    fVs[chn]=16/5 * fVp[chn] + 4; // JAM 20170726 Scale the mA to V.
+                    fVs[chn]=fVp[chn];
                     printf("fVs is %f \n fVp is %f \n", fVs[chn], fVp[chn]);
                 }
             }
@@ -1412,12 +1412,12 @@ void fControl(void)
         }  //Chiude il loop della notte 18.08.2000
         if(LAYER[chn]==2) { // LAYER OFF
             fVp[chn] = 0;
-            fVs[chn]=fVp[chn];
+            fVs[chn]=fVp[chn]
         }
 
 
 
-        txlm[chn] = txlm[chn] + fVp[chn];
+        txlm[chn] = txlm[chn] + fVs[chn];
         medo[chn] = medo[chn] + fpps[chn];
         vento[chn] = fwind + vento[chn];
     }
@@ -1432,7 +1432,7 @@ void set_output(void)
     for(chn=0; chn < N_CHANNELS+1; chn++) {
         if(LAYER[chn]==0) { // CO2 CONTROL LAYER
             if ((ora<starttime_co2 || ora>endtime_co2) && !(nighttime_remote && nighttime_local)) { // Esegue le operazioni solo di giorno 18.08.2000
-                anaOutmAmps(ChanAddr(DABRD, chn), 0);
+                anaOutVolts(ChanAddr(DABRD, chn), 0);
                 digOut(ChanAddr(RELAY, 2),TURNOFF);  //CO2 shutoff valve
             } else {
                 anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
@@ -1442,9 +1442,9 @@ void set_output(void)
         if(LAYER[chn]==1) { // O3 CONTROL LAYER
             //tam0509 if (ora<sunr || ora>suns)   // Esegue le operazioni solo di giorno 18.08.2000
             if (ora<starttime_ozone || ora>endtime_ozone) { // Esegue le operazioni solo di giorno 18.08.2000
-                anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), 0);
+                anaOutVolts(ChanAddr(DABRD, DA_Channel[chn]), 0);
             } else {
-                anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
+                anaOutVolts(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
             }
         }
     }
@@ -1485,7 +1485,7 @@ void second_data(void)
         sprintf(mess, "H,%d,%.2f\r",(flow|purge),fVs[1]);
         sock_write(&sock_B,mess,strlen(mess));
 #endif
-        sprintf(message,"S,%d,%02d:%02d:%02d,%.2f,%.0f,%.0f,%.2f,%.0f,%.0f,%.1f,%.0f,%d \r",UNIT_ID,rtc.tm_hour,rtc.tm_min,rtc.tm_sec,fVp[0],fpps[0],TARG[0],fVp[1],fpps[1],TARG[1],fFwind,Direz,opSect[0]);
+        sprintf(message,"S,%d,%02d:%02d:%02d,%.2f,%.0f,%.0f,%.2f,%.0f,%.0f,%.1f,%.0f,%d \r",UNIT_ID,rtc.tm_hour,rtc.tm_min,rtc.tm_sec,fVs[0],fpps[0],TARG[0],fVs[1],fpps[1],TARG[1],fFwind,Direz,opSect[0]);
         serDputs(message);
         while (serDwrFree() != DOUTBUFSIZE) ;
 
@@ -3018,8 +3018,3 @@ void readString_IP(void)
     }
     string_pos_ip = 0;
 }
-
-
-
-
-
