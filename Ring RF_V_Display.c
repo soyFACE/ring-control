@@ -1435,7 +1435,7 @@ void set_output(void)
                 anaOutVolts(ChanAddr(DABRD, chn), 0);
                 digOut(ChanAddr(RELAY, 2),TURNOFF);  //CO2 shutoff valve
             } else {
-                anaOutmAmps(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
+                anaOutVolts(ChanAddr(DABRD, DA_Channel[chn]), (fVs[chn]*DA_MULT[chn]));
                 digOut(ChanAddr(RELAY, 2),TURNON);  //CO2 shutoff valve
             }
         }
@@ -1655,8 +1655,8 @@ void calibrate(int sector)
     int m;
 
 
-    anaOutmAmps(ChanAddr(DABRD, DA_Channel[0]), 10);
-    anaOutmAmps(ChanAddr(DABRD, DA_Channel[1]), 10);
+    anaOutVolts(ChanAddr(DABRD, DA_Channel[0]), 10);
+    anaOutVolts(ChanAddr(DABRD, DA_Channel[1]), 10);
     digOut(ChanAddr(RELAY, 1),TURNON); //Turn on AC flow
     //anaOutVolts(ChanAddr(DABRD, 0), 5);  //Set Control Valve at 50%
     //anaOutVolts(ChanAddr(DABRD, 1), 5);  //Set Control Valve at 50%
