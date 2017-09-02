@@ -293,10 +293,10 @@ uint giorno;
 uint mese;
 uint ggiul;
 float dayl;
-float starttime_ozone = 9
-float endtime_ozone = 17
-float starttime_co2 = 8
-float endtime_co2 = 17
+float starttime_ozone = 9;
+float endtime_ozone = 17;
+float starttime_co2 = 8;
+float endtime_co2 = 17;
 float sunr;
 float suns;
 float ora;  //Current Decimal Time
@@ -1245,7 +1245,7 @@ void fControl(void)
                     }
 
                     nCont01[chn]++;
-                    fVs[chn]=fVp[chn]*5/8-(5/2);
+                    fVs[chn]=fVp[chn];
                 } else {
                     fFspro[chn] = fFspro[chn] - fFpro0[chn][ nCont02[chn]];
                     fFsdif[chn] = fFsdif[chn] - fFdif0[chn][ nCont02[chn]];
@@ -1310,7 +1310,7 @@ void fControl(void)
                         //CO2_rem = 0;
 
                     }
-                    fVs[chn]=fVp[chn]*5/8-(5/2); // JAM 20170726 Scale the mA to V.
+                    fVs[chn]=16/5 * fVp[chn] + 4; // JAM 20170726 Scale the mA to V.
                     printf("fVs is %f \n fVp is %f \n", fVs[chn], fVp[chn]);
                 }
             }
@@ -1417,7 +1417,7 @@ void fControl(void)
 
 
 
-        txlm[chn] = txlm[chn] + fVs[chn];
+        txlm[chn] = txlm[chn] + fVp[chn];
         medo[chn] = medo[chn] + fpps[chn];
         vento[chn] = fwind + vento[chn];
     }
@@ -1485,7 +1485,7 @@ void second_data(void)
         sprintf(mess, "H,%d,%.2f\r",(flow|purge),fVs[1]);
         sock_write(&sock_B,mess,strlen(mess));
 #endif
-        sprintf(message,"S,%d,%02d:%02d:%02d,%.2f,%.0f,%.0f,%.2f,%.0f,%.0f,%.1f,%.0f,%d \r",UNIT_ID,rtc.tm_hour,rtc.tm_min,rtc.tm_sec,fVs[0],fpps[0],TARG[0],fVs[1],fpps[1],TARG[1],fFwind,Direz,opSect[0]);
+        sprintf(message,"S,%d,%02d:%02d:%02d,%.2f,%.0f,%.0f,%.2f,%.0f,%.0f,%.1f,%.0f,%d \r",UNIT_ID,rtc.tm_hour,rtc.tm_min,rtc.tm_sec,fVp[0],fpps[0],TARG[0],fVp[1],fpps[1],TARG[1],fFwind,Direz,opSect[0]);
         serDputs(message);
         while (serDwrFree() != DOUTBUFSIZE) ;
 
@@ -3018,8 +3018,3 @@ void readString_IP(void)
     }
     string_pos_ip = 0;
 }
-
-
-
-
-
