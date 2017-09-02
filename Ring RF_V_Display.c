@@ -1412,7 +1412,7 @@ void fControl(void)
         }  //Chiude il loop della notte 18.08.2000
         if(LAYER[chn]==2) { // LAYER OFF
             fVp[chn] = 0;
-            fVs[chn]=fVp[chn]
+            fVs[chn]=fVp[chn];
         }
 
 
