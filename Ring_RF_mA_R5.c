@@ -1220,6 +1220,7 @@ void fControl(void)
             //if (ora<sunr | ora>suns | !nighttime_remote | !nighttime_local | !CO2_rem | !CO2_loc)   // If nighttime_remote
             if(((ora<starttime_co2 || ora>endtime_co2) && !(nighttime_remote && nighttime_local))|| !CO2_rem || !CO2_loc ) {
                 fVs[chn]=0;
+                fVp[chn]=0;
             } else { // Daytime
                 if (nCont01[chn] <= DIM_L) { //Delay for first 45 seconds
 
@@ -1245,7 +1246,7 @@ void fControl(void)
                     }
 
                     nCont01[chn]++;
-                    fVs[chn]=fVp[chn];
+                    fVs[chn]= 16/5 * fVp[chn] + 4; // JAM 20170903 Scale the voltage output to mA
                 } else {
                     fFspro[chn] = fFspro[chn] - fFpro0[chn][ nCont02[chn]];
                     fFsdif[chn] = fFsdif[chn] - fFdif0[chn][ nCont02[chn]];
